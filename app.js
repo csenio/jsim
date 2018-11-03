@@ -18,13 +18,18 @@ window.addEventListener('keyup',function(e){
 },true);
 
 
+// modal + question inteligence
+// function modal(){
+    
+// }
 
-
+//player movement + wall inteligence
 var player = {
     x: 650,
     y: 220,
     width: 40,
-    height: 40
+    height: 40,
+    life: 6
 }
 
 function Wall(name,x,y,width,height){
@@ -77,6 +82,8 @@ obstacles.push(topleftwall, toprightwall,topmiddlewall,leftwall,rightwall,bottom
 
 // var leftspeed = 1
 
+
+
 function animate(){
     requestAnimationFrame(animate);
     c.clearRect(0,0,window.innerWidth,window.innerHeight)
@@ -86,9 +93,18 @@ function animate(){
     let upspeed = 5
     let downspeed = 5
 
+    var padding = 10
+
+    for(let i = 0;i<player.life;i++){
+        c.fillStyle = 'red'
+        c.fillRect(padding,10,40,40)
+        padding+=50
+    }
+
 
 for(i of obstacles){
     // graphics
+    c.fillStyle = 'black'
     c.fillRect(i.x,i.y,i.width,i.height)
     // physics
     if(player.y <= i.y + i.height && player.y > i.y || player.y + player.height  <= i.y+i.height && player.y + player.height > i.y){
@@ -125,10 +141,11 @@ for(i of obstacles){
         player.y+=downspeed
     }
    
-    c.fillRect(player.x,player.y,player.width,player.height)
+    c.fillStyle = 'green'
+    c.fillRect(player.x,player.y,player.width,player.height) 
 
     for(i of persons){
-        // c.fillStyle = i.color
+        c.fillStyle = i.color
         c.strokeRect(i.x,i.y,i.width, i.height)
         // c.fillStyle = i.color
         // c.stroke()
@@ -141,9 +158,9 @@ for(i of obstacles){
             player.x + player.width > i.x &&
             player.y < i.y + i.height &&
             player.height + player.y > i.y){
-                console.log(active.indexOf(active.find(e => e.name == i.name)))
+                // console.log(active.indexOf(active.find(e => e.name == i.name)))
                 active.splice(active.indexOf(active.find(e => e.name == i.name)),1)
-                // popup()
+                popup()
                 // active.splice(0,1)
             }
     }
@@ -154,3 +171,57 @@ for(i of obstacles){
 }
 
 animate()
+
+function Question(question,wronganswer1,wronganswer2,rightAnswer){
+    this.question = question;
+    this.allAnswers = [wronganswer1,wronganswer2,rightAnswer];
+    this.rightAnswer = rightAnswer
+}
+
+var questionList = []
+
+questionList.push(
+    new Question("what is the answer???","it's b","no this one","it's a"),
+    new Question("what is the b???","b","this one","aaaaaaaaa"),
+    new Question("what is the c???","b","grrrr one","bbbbbbbbb")
+)
+
+function popup(){
+    var modal = document.getElementById('myModal');
+    var question = document.querySelector(".question")
+    shuffle(questionList)[0]
+    let currentQuestions = shuffle(questionList[0].allAnswers)
+    var answers = document.querySelectorAll(".answers")
+    for(i in answers){
+        
+        answers[i].textContent = currentQuestions[i]
+        answers[i].onclick = function(e){
+            if(e.target.textContent == questionList[0].rightAnswer){
+                modal.style.display = "none";
+            }else{
+                player.life--
+                modal.style.display = "none";
+            }
+            console.log(e.target.textContent == questionList[0].rightAnswer)
+        }
+    }
+    
+    question.textContent = questionList[0].question
+
+
+    function modaler() {
+        modal.style.display = "block";
+    }
+
+    modaler()
+}
+function shuffle(a) {
+    var j, x, i;
+    for (i = a.length - 1; i > 0; i--) {
+        j = Math.floor(Math.random() * (i + 1));
+        x = a[i];
+        a[i] = a[j];
+        a[j] = x;
+    }
+    return a;
+}
